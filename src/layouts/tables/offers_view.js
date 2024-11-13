@@ -45,6 +45,7 @@ import { useState } from "react";
 
 // Material Dashboard 2 React context
 import { useMaterialUIController, setLayout } from "context";
+
 import OffersModal from "./offers";
 import icon from "assets/theme/components/icon";
 import { Cookies } from "react-cookie";
@@ -55,25 +56,6 @@ import DynamicDataTable from "./offers_data";
 function OffersView({ children }) {
   const [cookies, setCookie, removeCookie] = useCookies(["phone_number"]);
   const baseUrl = process.env.REACT_APP_BACKEND_BASE_URL;
-  //offers collumn
-  const OffersCollum = [
-    {
-      name: "Offer Number",
-      selector: (row) => row.id,
-    },
-    {
-      name: "Application Number",
-      selector: (row) => row.application_id,
-    },
-    {
-      name: "Applicant ",
-      selector: (row) => row.applicant_id,
-    },
-    {
-      name: "Status",
-      selector: (row) => (row.offer_accepted ? "Accepted" : "Pending"),
-    },
-  ];
 
   // offers model
   const [modalOpenOffer, setModalOpenOffer] = useState(false);
@@ -94,19 +76,13 @@ function OffersView({ children }) {
     };
 
     fetchOffers();
-
-   
-  }, );
+  });
 
   const [offers_record, setOffers_record] = useState([]);
 
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav } = controller;
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    setLayout(dispatch, "dashboard");
-  }, [pathname]);
 
   return (
     <MDBox
@@ -123,8 +99,6 @@ function OffersView({ children }) {
         },
       })}
     >
-      {" "}
-      <DashboardNavbar />
       <Grid container spacing={9}>
         <Grid item xs={12}>
           <MDBox
@@ -139,9 +113,9 @@ function OffersView({ children }) {
           >
             <MDTypography variant="h6" color="white">
               <MDButton onClick={handleModalOpenOffer}>
-                <Icon>add</Icon> Enter Offer
+                <Icon>add</Icon> New Deed Application
               </MDButton>
-              <center> Recent Land Offers</center>
+              <center> Recent Title Deeds Appliction</center>
             </MDTypography>
           </MDBox>
 
@@ -150,8 +124,8 @@ function OffersView({ children }) {
               open={modalOpenOffer}
               onClose={handleModalCloseOffer}
             />
-        
-        <DynamicDataTable />
+
+            <DynamicDataTable />
             {/* <DataTable
               table={{ OffersCollum, applicatin_record }}
               isSorted={false}

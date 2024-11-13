@@ -28,9 +28,9 @@ import DefaultInfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
 
 // Billing page components
 
-import TitleDeed from "./components/Invoice";
+import MyTitleDeeds from "layouts/billing/components/Invoices";
 import ClientDashboardLayout from "examples/LayoutContainers/DashboardLayout/client_dashboard_layout";
-function MyTitleDeed() {
+function TitleDeed() {
   return (
     <ClientDashboardLayout>
       <DashboardNavbar absolute isMini />
@@ -38,7 +38,7 @@ function MyTitleDeed() {
         <MDBox mb={3}>
           <Grid container spacing={3}>
             <Grid item xs={12} lg={11}>
-              <TitleDeed />
+              <MyTitleDeeds />
             </Grid>
           </Grid>
         </MDBox>
@@ -48,4 +48,4 @@ function MyTitleDeed() {
   );
 }
 
-export default MyTitleDeed;
+export default TitleDeed;

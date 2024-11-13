@@ -1,59 +1,122 @@
-import React, { useState, useEffect } from "react";
-import Card from "@mui/material/Card";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import PropTypes from "prop-types";
+
+// @mui material components
+import Icon from "@mui/material/Icon";
+
+// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import MDButton from "components/MDButton";
-import Invoice from "layouts/billing/components/Invoice";
-import axios from "axios";
-
-function Invoices() {
-  const [invoices, setInvoices] = useState([]);
-  const baseUrl = process.env.REACT_APP_BACKEND_BASE_URL;
-  useEffect(async () => {
-
-    try {
-      const response = await axios.get(`http://localhost/backend/web5/title_deeds/`);
-      console.log(`hey prince am here` ,response.data)
-      setInvoices(response.data)
-    } catch (error) {
-      console.log(error)
-    }
-   
-  }, []);
+import { Cookies, useCookies } from "react-cookie";
+function Invoice({ id, deed_number, title_deed, date, blockchainHash }) {
+  const printRowToPDF = () => {
+    window.open(
+      `http://localhost/backend/offer_letter/pdf.php?row_id=${id}&deed_number=${deed_number}&title_deed=${title_deed}&date=${date}$blockchainHash=${blockchainHash}`,
+      "_blank"
+    );
+  };
 
   return (
-    <Card sx={{ height: "100%" }}>
-      <MDBox
-        pt={2}
-        px={2}
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <MDTypography variant="h6" fontWeight="medium">
-          Land Deeds
+    <MDBox
+      component="li"
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      py={1}
+      pr={1}
+    >
+      <MDBox lineHeight={1.125}>
+        <MDTypography display="block" variant="button" fontWeight="medium">
+          {title_deed}
         </MDTypography>
-        <MDButton variant="outlined" color="info" size="small">
-          Search
-        </MDButton>
+        <MDTypography variant="caption" fontWeight="regular" color="text">
+          {deed_number}
+        </MDTypography>
+        <MDTypography variant="caption" fontWeight="regular" color="text">
+          {blockchainHash}
+        </MDTypography>
       </MDBox>
-      <MDBox p={2}>
-        <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
-          {invoices.map((invoice, index) => (
-            <Invoice
-              id={invoice.land_code
-              }
-              key={index}
-              title_deed={invoice.title_deed_name}
-              deed_number={invoice.title_deed_number}
-              date={invoice.transaction_hash
-                }
-            />
-          ))}
+      <MDBox display="flex" alignItems="center">
+        <MDTypography variant="button" fontWeight="regular" color="text">
+          {date}
+        </MDTypography>
+        <MDBox
+          display="flex"
+          alignItems="center"
+          lineHeight={1}
+          ml={3}
+          sx={{ cursor: "pointer" }}
+        >
+          <button onClick={printRowToPDF}>
+            <Icon fontSize="small">picture_as_pdf</Icon>
+            <MDTypography variant="button" fontWeight="bold">
+              &nbsp;PDF
+            </MDTypography>
+          </button>
         </MDBox>
       </MDBox>
-    </Card>
+    </MDBox>
   );
 }
 
-export default Invoices;
+Invoice.propTypes = {
+  id: PropTypes.string.isRequired,
+  deed_number: PropTypes.string.isRequired,
+  title_deed: PropTypes.string.isRequired,
+  date: PropTypes.string.isRequired,
+  blockchainHash: PropTypes.string.isRequired,
+};
+
+const MyTitleDeeds = () => {
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const baseUrl = process.env.REACT_APP_BACKEND_BASE_URL; // Make sure this is set in .env
+  const cookies = useCookies(["user_id"]);
+  const user_id = cookies.user_id;
+  // Fetch data from the backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/web5/all_title_deeds`, {
+          params: {
+            user_id: user_id,
+          },
+        });
+        setData(response.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching title deeds: ", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [baseUrl]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <MDBox p={3}>
+      <MDTypography variant="h4" fontWeight="medium" mb={3}>
+        Title Deeds
+      </MDTypography>
+      <ul>
+        {data.map((deed) => (
+          <Invoice
+            key={deed.id}
+            id={deed.id.toString()}
+            deed_number={deed.title_deed_number}
+            title_deed={deed.title_deed_name}
+            date={new Date().toLocaleDateString()}
+            blockchainHash={deed.transaction_hash}
+          />
+        ))}
+      </ul>
+    </MDBox>
+  );
+};
+
+export default MyTitleDeeds;

@@ -57,8 +57,8 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Offers",
-    key: "offers",
+    name: "Title Deeds",
+    key: "title_deeds",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/tables/offers_view",
     component: <OffersView />,
@@ -69,8 +69,8 @@ const routes = [
     name: "Documents",
     key: "billing",
     icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
+    route: "/tables/register_view",
+    component: <RegisterView />,
   },
   {
     type: "collapse",

@@ -42,6 +42,7 @@ import MDBox from "components/MDBox";
 import MyModal from "./registered";
 import ApplicationsModal from "./applications";
 import { useState } from "react";
+import TitleDeeds from "layouts/billing/components/Invoice";
 
 // Material Dashboard 2 React context
 import { useMaterialUIController, setLayout } from "context";
@@ -55,92 +56,6 @@ import DynamicDataTable from "./register_data";
 function RegisterView({ children }) {
   const [cookies, setCookie, removeCookie] = useCookies(["phone_number"]);
   const baseUrl = process.env.REACT_APP_BACKEND_BASE_URL;
-  // land collums
-  const column = [
-    {
-      name: "Land Code",
-      selector: (row) => row.land_id,
-    },
-    {
-      name: "Land loard",
-      selector: (row) => row.land_loard,
-    },
-    {
-      name: "Size(ha)",
-      selector: (row) => row.size,
-    },
-    {
-      name: "View",
-      selector: (row) => row.layout,
-    },
-  ];
-  // columns: [
-  //   { Header: "LandCode", accessor: "project", width: "30%", align: "left" },
-  //   { Header: "LandLoard", accessor: "budget", align: "left" },
-  //   { Header: "size(ha)", accessor: "status", align: "center" },
-  //   { Header: "view", accessor: "completion", align: "center" },
-  //   { Header: "action", accessor: "action", align: "center" },
-  // ]
-
-  //application colllumn
-  const applicationsColumn = [
-    {
-      name: "Application Number",
-      selector: (row) => row.id,
-    },
-    {
-      name: "Applicant ID",
-      selector: (row) => row.national_id,
-    },
-    {
-      name: "From",
-      selector: (row) => row.user_id,
-    },
-    {
-      name: "To",
-      selector: (row) => row.to_id,
-    },
-    {
-      name: "Date",
-      selector: (row) => row.application_date,
-    },
-  ];
-
-  //offers collumn
-  const OffersCollum = [
-    {
-      name: "Offer Number",
-      selector: (row) => row.id,
-    },
-    {
-      name: "Application Number",
-      selector: (row) => row.application_id,
-    },
-    {
-      name: "Applicant ",
-      selector: (row) => row.applicant_id,
-    },
-    {
-      name: "Status",
-      selector: (row) => (row.offer_accepted ? "Accepted" : "Pending"),
-    },
-  ];
-
-  //transfers collumn
-  const TransferCollum = [
-    {
-      name: "Deed Number",
-      selector: (row) => row.deed_number,
-    },
-    {
-      name: "Ownership Title",
-      selector: (row) => row.title_deed,
-    },
-    {
-      name: "Date Created ",
-      selector: (row) => row.expiary_date,
-    },
-  ];
 
   //minting
   const [modalOpen, setModalOpen] = useState(false);
@@ -183,52 +98,14 @@ function RegisterView({ children }) {
     setShowModal(!showModal);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      axios(`${baseUrl}/web5/land_layouts/`)
-        .then((res) => setRecord(res.data))
-        .catch((err) => console.log(err));
-    };
-    const fetchOffers = async () => {
-      axios(`${baseUrl}/web5/offers/`)
-        .then((res) => setOffers_record(res.data))
-        .catch((err) => console.log(err));
-    };
-    const fetchApplication = async () => {
-      axios(`${baseUrl}/web5/application/`)
-        .then((res) => setApplication_record(res.data))
-        .catch((err) => console.log(err));
-    };
-    const fetchTitleDeeds = async () => {
-      axios(`${baseUrl}/web5/title_deeds/`)
-        .then((res) => setLand_title_record(res.data))
-        .catch((err) => console.log(err));
-    };
-    fetchOffers();
-    fetchData();
-    fetchApplication();
-    fetchTitleDeeds();
-
-    swal("1 New Record");
-  }, [refresher]);
-
-  const [record, setRecord] = useState([]);
-  const [offers_record, setOffers_record] = useState([]);
-  const [applicatin_record, setApplication_record] = useState([]);
-  const [land_title_record, setLand_title_record] = useState([]);
-
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav } = controller;
   const { pathname } = useLocation();
 
-  useEffect(() => {
-    setLayout(dispatch, "dashboard");
-    swal("Hello ", cookies.phone_number.toString());
-  }, [pathname]);
-
-  useEffect(() => {
-    swal("Hello ", cookies.phone_number.toString());
-  }, []);
+  // useEffect(() => {
+  //   setLayout(dispatch, "dashboard");
+  //   swal("Hello ", cookies.phone_number.toString());
+  // }, [pathname]);
 
   return (
     <MDBox
@@ -271,7 +148,7 @@ function RegisterView({ children }) {
 
           <MDBox pt={3}>
             <MyModal open={modalOpen} onClose={handleModalClose} />
-            <DynamicDataTable />
+            <TitleDeeds />
           </MDBox>
         </Grid>
 

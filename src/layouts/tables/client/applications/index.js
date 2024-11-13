@@ -162,14 +162,6 @@ function UserApplicationsView({ children }) {
             />
 
             <UserApplicationDataTable />
-
-            {/* <DataTable
-              table={{ applicationsColumn, applicatin_record }}
-              isSorted={false}
-              entriesPerPage={false}
-              showTotalEntries={false}
-              noEndBorder
-            /> */}
           </MDBox>
         </Grid>
 

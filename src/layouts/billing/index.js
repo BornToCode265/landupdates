@@ -25,17 +25,34 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import MasterCard from "examples/Cards/MasterCard";
 import DefaultInfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
+import { useMaterialUIController, setLayout } from "context";
 
 // Billing page components
 import PaymentMethod from "layouts/billing/components/PaymentMethod";
 import Invoices from "layouts/billing/components/Invoices";
+
 import OfferLetter from "layouts/billing/components/Invoices/offer_letter";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Transactions from "layouts/billing/components/Transactions";
 
 function Billing() {
+  const [controller, dispatch] = useMaterialUIController();
+  const { miniSidenav } = controller;
   return (
-    <DashboardLayout>
+    <MDBox
+      sx={({ breakpoints, transitions, functions: { pxToRem } }) => ({
+        p: 3,
+        position: "relative",
+
+        [breakpoints.up("xl")]: {
+          marginLeft: miniSidenav ? pxToRem(120) : pxToRem(274),
+          transition: transitions.create(["margin-left", "margin-right"], {
+            easing: transitions.easing.easeInOut,
+            duration: transitions.duration.standard,
+          }),
+        },
+      })}
+    >
       <DashboardNavbar absolute isMini />
       <MDBox mt={8}>
         <MDBox mb={3}>
@@ -50,7 +67,7 @@ function Billing() {
         </MDBox>
       </MDBox>
       <Footer />
-    </DashboardLayout>
+    </MDBox>
   );
 }
 
