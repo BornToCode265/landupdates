@@ -46,8 +46,11 @@ function Basicp() {
   const handleBuyClick = () => {
     setBuyClicked(!buyClicked);
   };
-  const handleMints = () => {
-    axios
+  const handleMints = async () => {
+    // console.log(
+    //   `land code : ${land_id} : price : ${price}: owner :  ${user_id}`
+    // );
+     await axios
       .put(`${baseUrl}/listed_lands/index.php`, {
         land_code: land_id, // Send land_code in the request body
         price: price, // Send price in the request body
@@ -85,7 +88,7 @@ function Basicp() {
     };
 
     fetchProjects();
-  }, [baseUrl]);
+  }, []);
 
   return (
     <ClientDashboardLayout>
@@ -98,38 +101,42 @@ function Basicp() {
       </Routes>
 
       <Grid container spacing={6} p={2}>
-        {projects.map((project, index) => (
-          <Grid item xs={12} md={6} xl={3} key={index}>
-            <DefaultProjectCard
-              image={land4sale} // Assuming each project has an image property
-              label={`Land #${index + 1}`}
-              title={project.title} // Assuming each project has a title property
-              description={project.description}
-              land_owner={project.full_name}
-              location={"Mzuzu"}
-              listed_id={project.id}
-              price={project.price}
-              size={project.size} // Assuming each project has a description property
-              action={{
-                type: "internal",
+        {projects.map((project, index) =>
+          project.owner_id == user_id ? (
+            " No Listed Lands "
+          ) : (
+            <Grid item xs={12} md={6} xl={3} key={index}>
+              <DefaultProjectCard
+                image={land4sale} // Assuming each project has an image property
+                label={`Land #${index + 1}`}
+                title={project.title} // Assuming each project has a title property
+                description={project.description}
+                land_owner={project.full_name}
+                location={"Mzuzu"}
+                listed_id={project.id}
+                price={project.price}
+                size={project.size} // Assuming each project has a description property
+                action={{
+                  type: "internal",
 
-                color: "info",
-                label: "view",
-                onClick: () => handleBuyClick, // Add this line
-              }}
-              authors={project.authors} // Assuming each project has an authors array
-            />
-            <MDButton
-              onClick={() => {
-                setPrice(project.price.toString());
-                setLand_id(project.id);
-                handleBuyClick();
-              }}
-            >
-              Add To Cart
-            </MDButton>
-          </Grid>
-        ))}
+                  color: "info",
+                  label: "view",
+                  onClick: () => handleBuyClick, // Add this line
+                }}
+                authors={project.authors} // Assuming each project has an authors array
+              />
+              <MDButton
+                onClick={() => {
+                  setPrice(project.price.toString());
+                  setLand_id(project.id);
+                  handleBuyClick();
+                }}
+              >
+                Add To Cart
+              </MDButton>
+            </Grid>
+          )
+        )}
       </Grid>
       {buyClicked && (
         <Modal open={handleBuyClick}>

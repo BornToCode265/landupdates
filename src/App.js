@@ -93,14 +93,13 @@ export default function App() {
       setMiniSidenav(dispatch, false);
       setOnMouseEnter(true);
     }
-   
   };
 
   // Close sidenav when mouse leave mini sidenav
   const handleOnMouseLeave = () => {
     if (onMouseEnter) {
       setMiniSidenav(dispatch, true);
-    
+
       setOnMouseEnter(false);
     }
   };
@@ -119,8 +118,6 @@ export default function App() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
-
-  
 
   const getRoutes = (allRoutes) =>
     allRoutes.flatMap((route) => {
@@ -193,7 +190,7 @@ export default function App() {
               {configsButton}
             </>
           )}
-           {layout === "client" && (
+          {layout === "client" && (
             <>
               <ClientSidenav
                 color={sidenavColor}
@@ -262,7 +259,10 @@ export default function App() {
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/authentication/register" />} />
+          <Route
+            path="*"
+            element={<Navigate to="/authentication/register" />}
+          />
         </Routes>
       </ThemeProvider>
     </CookiesProvider>

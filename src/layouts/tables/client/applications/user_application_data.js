@@ -3,214 +3,144 @@ import DataTable from "examples/Tables/DataTable";
 import axios from "axios";
 import MDButton from "components/MDButton";
 import swal from "sweetalert";
-//Axios imports
-
 import { ethers } from "ethers";
 import LandTransfersContractAbi from "assets/contractsData/LandTransfersContract.json";
 import LandTransfersContractAddress from "assets/contractsData/LandTransfersContract-address.json";
-import { date } from "yup";
+import { useCookies } from "react-cookie";
 
 const UserApplicationDataTable = () => {
   const [data, setData] = useState([]);
-  const [blockChainData, setBlockChainData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [cookies] = useCookies(["user_id"]);
+  const user_id = cookies.user_id;
   const baseUrl = process.env.REACT_APP_BACKEND_BASE_URL;
-  const price = "9500";
+
+  const getIsAcceptedStatus = (accepted) =>
+    accepted === 1 ? "Accepted" : "Submitted";
 
   const handleLayoutClick = (landCode) => {
     axios
-      .put(`${baseUrl}/web5/approve/`, {
-        params: { land_code: landCode.value },
-      })
-      .then((response) => {
-        // Handle success, e.g., update state or show a success message
-        console.log(response.data);
-
-        swal("Great Job ", landCode.toString(), "success");
+      .put(`${baseUrl}/web5/approve/`, { params: { land_code: landCode } })
+      .then(() => {
+        swal(
+          "Success",
+          `Land layout for ${landCode} is ready to view`,
+          "success"
+        );
       })
       .catch((error) => {
-        console.error("Error uploading file", error);
-        swal("Failed to list Land", error.toString(), "error");
-        // Handle error, e.g., show an error message to the user
+        console.error("Error accessing land layout", error);
+        swal("Failed to view Land", error.toString(), "error");
       });
   };
 
-  const handleMints = async (land_code_id) => {
-    //creating provider
+  const handleMints = async (landCode) => {
     const provider = new ethers.providers.JsonRpcProvider(
       "http://127.0.0.1:8545/"
     );
-    const private_key =
+    const privateKey =
       "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-    const wallet = new ethers.Wallet(private_key, provider);
+    const wallet = new ethers.Wallet(privateKey, provider);
 
-    //instance of contract for land transfers
     const LandProcessContract = new ethers.Contract(
       LandTransfersContractAddress.address,
       LandTransfersContractAbi.abi,
       wallet
     );
 
-    //getting address
-    const address = await wallet.getAddress();
-    //console.log("Wallet address:", address);
-
     try {
-      const response = await axios.get(
-        `http://localhost/backend/web5/web3/title_deeds/`,
-        {
-          params: {
-            listed_land_id: land_code_id.value.toString(),
-          },
-        }
-      );
+      const response = await axios.get(`${baseUrl}/web5/web3/title_deeds/`, {
+        params: { listed_land_id: landCode },
+      });
 
-      setBlockChainData(response.data);
-
-      const increment_land = await LandProcessContract.getTotal();
-      const land_new_id = parseInt(increment_land) + 1;
-
-      const title_deed_number = response.data[0]["land_id"];
-      const title_deed_name = response.data[0]["full_name"];
-      const land_code = response.data[0]["land_id"] + land_new_id.toString();
-      const owner_nation_id = response.data[0]["nation_id"];
-      const owner_phone_number = response.data[0]["phone_number"];
-      const land_type = response.data[0]["type"];
-      const land_layout_url = response.data[0]["layout"];
+      const landData = response.data[0];
+      const landNewId = (await LandProcessContract.getTotal()).toNumber() + 1;
 
       const tx = await LandProcessContract.make_transaction(
-        title_deed_number.toString(),
-        title_deed_name.toString(),
-        land_code.toString(),
-        owner_nation_id.toString(),
-        owner_phone_number.toString(),
-        land_type.toString(),
-        land_layout_url.toString()
+        landData.land_id.toString(),
+        landData.full_name.toString(),
+        `${landData.land_id}_${landNewId}`,
+        landData.nation_id.toString(),
+        landData.phone_number.toString(),
+        landData.type?.toString() || "Unknown",
+        landData.layout?.toString() || "N/A"
       );
 
-      // console.log("----tx start ---")
-      // console.log(tx.hash)
-      // console.log("----end----")
+      await axios.post(`${baseUrl}/web5/web3/title_deeds/index.php`, {
+        tx_hash: tx.hash,
+        title_deed_number: landData.land_id.toString(),
+        title_deed_name: landData.full_name.toString(),
+        land_code: `${landData.land_id}_${landNewId}`,
+        owner_nation_id: landData.nation_id.toString(),
+        owner_phone_number: landData.phone_number.toString(),
+        land_type: landData.type?.toString() || "Unknown",
+        land_layout_url: landData.layout?.toString() || "N/A",
+      });
 
-      try {
-        axios
-          .post(`${baseUrl}/web5/web3/title_deeds/index.php`, {
-            tx_hash: tx.hash,
-            title_deed_number: title_deed_number.toString(),
-            title_deed_name: title_deed_name.toString(),
-            land_code: land_code.toString(),
-            owner_nation_id: owner_nation_id.toString(),
-            owner_phone_number: owner_phone_number.toString(),
-            land_type: land_type.toString(),
-            land_layout_url: land_layout_url.toString(),
-          })
-          .then(function (response) {
-            console.log(response.data);
-            try {
-              //update table of land to nomal land
-              axios
-                .put(`${baseUrl}/web5/web3/title_deeds/index.php`, null, {
-                  params: { land_code: land_code_id.value.toString() },
-                })
-                .then((response) => {
-                  // Handle success, e.g., update state or show a success message
-                  console.log(response.data);
-
-                  swal(
-                    "You have add approved the title deed",
-                    land_code.toString(),
-                    "success"
-                  );
-                })
-                .catch((error) => {
-                  console.error("Error uploading file", error);
-                  swal("Failed to list Land", error.toString(), "error");
-                  // Handle error, e.g., show an error message to the user
-                });
-            } catch (error) {
-              console.log(error);
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
-      setIsLoading(false);
+      swal(
+        "Application Approved",
+        `Title deed minted for ${landData.land_id}`,
+        "success"
+      );
     } catch (error) {
-      console.error("Error fetching data: ", error);
+      console.error("Minting error: ", error);
+      swal("Minting Failed", "Please try again later", "error");
+    } finally {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
+
       try {
-        const response = await axios.get(
-          `http://localhost/backend/web5/application/`
-        );
-        console.log(response.data);
+        const response = await axios.get(`${baseUrl}/web5/my_applications`, {
+          params: { user_id: user_id },
+        });
         setData(response.data);
-        setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching data: ", error);
+        setError("Error fetching application data. Please try again later.");
+      } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [baseUrl, user_id]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <DataTable
       table={{
         columns: [
+          { Header: "Application ID", accessor: "id" },
           { Header: "Land ID", accessor: "land_id" },
-          { Header: "Applicant Name", accessor: "applicant_name" },
 
-          { Header: "Price", accessor: "price" },
-          { Header: "Size", accessor: "size" },
-          { Header: "Type", accessor: "type" },
+          { Header: "Appliction Date", accessor: "application_date" },
           {
-            Header: "Layout",
-            accessor: "layout",
-            Cell: ({ value }) => (
-              <MDButton
-                variant="gradient"
-                color="primary"
-                onClick={() => handleLayoutClick(value)}
-              >
-                view
-              </MDButton>
-            ),
+            Header: "Status",
+            accessor: "accepted",
+            Cell: ({ row }) => getIsAcceptedStatus(row.original.accepted),
           },
-
           {
             Header: "Action",
-            accessor: "accepted",
-            Cell: ({ value }) => (
+            accessor: "actions",
+            Cell: ({ row }) => (
               <MDButton
                 variant="gradient"
                 color="warning"
-                onClick={handleMints({ value })}
+                onClick={() => handleMints(row.original.land_id)}
               >
-                {" "}
-                Approve{" "}
+                Cancel
               </MDButton>
             ),
           },
         ],
-        rows: data.map((item) => ({
-          land_id: item.land_id,
-          applicant_name: item.full_name,
-          price: item.price,
-          size: item.size,
-          type: item.type,
-          layout: item.layout,
-
-          accepted: item.land_id,
-        })),
+        rows: data,
       }}
     />
   );

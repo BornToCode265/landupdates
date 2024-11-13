@@ -101,7 +101,7 @@ const handleBuyClick = () => {
     };
 
     fetchProjects();
- }, [baseUrl]);
+ },);
 
  return (
   

@@ -12,8 +12,8 @@ import PropTypes from "prop-types";
 import Basicp from "layouts/tables/client/index";
 import MyLands from "layouts/tables/client/my_lands/";
 import MyListedLands from "layouts/tables/client/my_listed_lands/";
-import MyTitleDeed from "layouts/tables/client/documets";
-import UserApplicationsView from "layouts/tables/client/applications";
+import MyTitleDeed from "layouts/tables/client/documets/";
+import UserApplicationsView from "layouts/tables/client/applications/";
 
 import { useEffect } from "react";
 
@@ -38,7 +38,7 @@ function ClientSidenav({ color, brand, brandName, ...rest }) {
   const phone_number = cookies.phone_number;
   const user_name = cookies.full_name;
   // Static routes
-  const routes1 = [
+  const routes2 = [
     {
       type: "collapse",
       name: "Listed Lands",
@@ -76,7 +76,7 @@ function ClientSidenav({ color, brand, brandName, ...rest }) {
       name: "Title Deed",
       key: "my_title_deed",
       icon: <Icon fontSize="small">land</Icon>,
-      route: "/tables/client/documets",
+      route: "/tables/client/documets/",
       component: <MyTitleDeed />,
     },
   ];
@@ -128,7 +128,7 @@ function ClientSidenav({ color, brand, brandName, ...rest }) {
     return () => window.removeEventListener("resize", handleMiniSidenav);
   }, [dispatch, location]);
 
-  const renderRoutes = routes1.map(
+  const renderRoutes = routes2.map(
     ({ type, name, icon, title, noCollapse, key, href, route }) => {
       let returnValue;
 
@@ -189,7 +189,7 @@ function ClientSidenav({ color, brand, brandName, ...rest }) {
     }
   );
 
-  const renderExampleRoutes = routes1.map(
+  const renderExampleRoutes = routes2.map(
     ({ type, name, icon, title, noCollapse, key, href, route }) => {
       let returnValue;
 

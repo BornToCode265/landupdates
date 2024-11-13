@@ -29,10 +29,10 @@ import DefaultInfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
 // Billing page components
 
 import TitleDeed from "./components/Invoice";
-
+import ClientDashboardLayout from "examples/LayoutContainers/DashboardLayout/client_dashboard_layout";
 function MyTitleDeed() {
   return (
-    <DashboardLayout>
+    <ClientDashboardLayout>
       <DashboardNavbar absolute isMini />
       <MDBox mt={8}>
         <MDBox mb={3}>
@@ -44,7 +44,7 @@ function MyTitleDeed() {
         </MDBox>
       </MDBox>
       <Footer />
-    </DashboardLayout>
+    </ClientDashboardLayout>
   );
 }
 

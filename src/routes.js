@@ -16,9 +16,9 @@ import Basicp from "layouts/tables/client";
 import MyLands from "layouts/tables/client/my_lands/";
 import MyListedLands from "layouts/tables/client/my_listed_lands/";
 import LandListedDetails from "layouts/tables/client/land_listed_details.js";
-import UserApplicationsView from "layouts/tables/client/applications";
+import UserApplicationsView from "layouts/tables/client/applications/";
 
-import MyTitleDeed from "layouts/tables/client/documets";
+import MyTitleDeed from "layouts/tables/client/documets/";
 
 import Register from "layouts/authentication/register";
 
@@ -113,22 +113,22 @@ const routes = [
     route: "/tables/client/my_lands/",
     component: <MyLands />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "",
-  //   key: "my_application",
+  {
+    type: "collapse",
+    name: "",
+    key: "my_application",
 
-  //   route: "/tables/client/applications/",
-  //   component: <UserApplicationsView />,
-  // },
-  // {
-  //   type: "collapse",
-  //   name: "",
-  //   key: "my_title_deed",
+    route: "/tables/client/applications/",
+    component: <UserApplicationsView />,
+  },
+  {
+    type: "collapse",
+    name: "",
+    key: "my_title_deed",
 
-  //   route: "/tables/client/documets",
-  //   component: <MyTitleDeed />,
-  //},
+    route: "/tables/client/documets/",
+    component: <MyTitleDeed />,
+  },
   {
     type: "collapse",
     name: "",
