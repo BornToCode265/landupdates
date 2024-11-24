@@ -21,11 +21,8 @@ contract LandTitleDeed is ERC721, Ownable {
         string landLayoutUrl;
     }
 
-    // Mapping from deed ID to TitleDeed details
     mapping(uint256 => TitleDeed) private titleDeeds;
-    // Mapping to keep track of all deed IDs for a given user ID
     mapping(uint256 => uint256[]) private userToTitleDeeds;
-    // Mapping to retrieve deed ID by land code
     mapping(string => uint256) private landCodeToDeedId;
 
     event TitleDeedMinted(
@@ -42,17 +39,6 @@ contract LandTitleDeed is ERC721, Ownable {
 
     constructor() ERC721("LandTitleDeed", "LTD") Ownable(msg.sender) {}
 
-    /**
-     * @notice Mint a new title deed
-     * @param userId The ID of the user who owns the deed
-     * @param transactionHash The transaction hash for the deed creation
-     * @param titleDeedName The name of the title deed
-     * @param landCode A unique code representing the land
-     * @param ownerNationId The national ID of the landowner
-     * @param ownerPhoneNumber The phone number of the landowner
-     * @param landType The type of the land (e.g., Customary, Leasehold)
-     * @param landLayoutUrl URL to the land layout document or map
-     */
     function mintTitleDeed(
         uint256 userId,
         string memory transactionHash,
@@ -97,11 +83,6 @@ contract LandTitleDeed is ERC721, Ownable {
         );
     }
 
-    /**
-     * @notice Retrieve all title deeds for a specific user
-     * @param userId The ID of the user
-     * @return An array of title deed numbers associated with the user
-     */
     function getTitleDeedsByUser(
         uint256 userId
     ) public view returns (TitleDeed[] memory) {
@@ -115,31 +96,29 @@ contract LandTitleDeed is ERC721, Ownable {
         return deeds;
     }
 
-    /**
-     * @notice Retrieve a title deed by land code
-     * @param landCode The code representing the land
-     * @return The title deed details associated with the land code
-     */
     function getTitleDeedByLandCode(
         string memory landCode
     ) public view returns (TitleDeed memory) {
         uint256 deedId = landCodeToDeedId[landCode];
         require(
-            _exists(deedId),
+            isDeedValid(deedId),
             "Title deed does not exist for the provided land code"
         );
         return titleDeeds[deedId];
     }
 
-    /**
-     * @notice Retrieve a title deed by deed ID
-     * @param deedId The unique ID of the title deed
-     * @return The title deed details
-     */
     function getTitleDeedById(
         uint256 deedId
     ) public view returns (TitleDeed memory) {
-        require(_exists(deedId), "Title deed does not exist");
+        require(isDeedValid(deedId), "Title deed does not exist");
         return titleDeeds[deedId];
+    }
+
+    function isDeedValid(uint256 deedId) internal view returns (bool) {
+        try this.ownerOf(deedId) returns (address) {
+            return true;
+        } catch {
+            return false;
+        }
     }
 }
